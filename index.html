@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스펀지 바이블</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="header">
+  <div class="header-main">
+    <div class="header-left">스펀지 바이블</div>
+    <div class="header-center">
+      <img src="assets/logo.png" alt="스펀지 바이블 로고">
+    </div>
+    <div class="header-right">
+      <button class="font-btn" id="fdn" title="글자 작게">A−</button>
+      <button class="font-btn" id="fup" title="글자 크게">A+</button>
+    </div>
+  </div>
+</header>
+
+<!-- 로딩 -->
+<div id="loading">📖 성경 데이터 불러오는 중…</div>
+
+<!-- 앱 본문 -->
+<div id="app" style="display:none">
+
+  <!-- 컨트롤 바 -->
+  <div class="ctrl-wrap">
+    <div class="ctrl-bar">
+      <!-- 1행: 단계 버튼 -->
+      <div class="stage-row">
+        <button class="stage-btn on" data-s="0">전체 보기</button>
+        <button class="stage-btn"    data-s="1" title="명사 가리기">1단계</button>
+        <button class="stage-btn"    data-s="2" title="어구 가리기">2단계</button>
+        <button class="stage-btn"    data-s="3" title="전체 가리기">3단계</button>
+      </div>
+      <!-- 2행: 보조 버튼 + 진행률 -->
+      <div class="ctrl-foot">
+        <button class="reveal-btn" id="reveal-all">👁 전체 공개</button>
+        <span class="progress" id="progress">완료 0/0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 구절 목록 -->
+  <div class="verse-wrap">
+    <ol class="verse-bg" id="verse-list"></ol>
+  </div>
+
+</div>
+
+<!-- JS: 의존 순서대로 로드 -->
+<script src="js/masking.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
