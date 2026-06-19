@@ -6,6 +6,7 @@
 const SIZES   = ['14px','16px','18px','20px','22px','24px','26px','28px'];
 const LS_SIZE = 'sb-size';
 const LS_STAT = 'sponge-status-v1';
+const LS_POS  = 'sb-pos';
 
 /** @type {{ ref: string, text: string }[]} */
 let verses = [];
@@ -43,6 +44,10 @@ function setStage(s)  { stage = s; revealed = new Set(); }
 function isRevealed(ref)    { return revealed.has(ref); }
 function toggleReveal(ref)  { revealed.has(ref) ? revealed.delete(ref) : revealed.add(ref); }
 function revealAll()        { verses.forEach(v => revealed.add(v.ref)); }
+
+// ── 위치 ─────────────────────────────────
+function savePos(i) { try { localStorage.setItem(LS_POS, i); } catch (_) {} }
+function loadPos()  { try { return parseInt(localStorage.getItem(LS_POS)) || 1; } catch (_) { return 1; } }
 
 // ── 글자 크기 ─────────────────────────────
 function getSizeIdx()  { return sIdx; }

@@ -155,6 +155,29 @@ body {
   white-space: nowrap;
 }
 
+/* 3행: 위치 슬라이더 */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+#slider-label {
+  min-width: 52px;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #2563eb;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#verse-slider {
+  flex: 1;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
 /* ── 구절 목록 ── */
 .verse-wrap { padding: 16px 12px 60px; }
 

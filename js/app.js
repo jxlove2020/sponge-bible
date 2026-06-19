@@ -9,13 +9,15 @@ const STATUS_LABEL = { none: '−', learning: '학습중', memorized: '완료' }
 const STATUS_CLASS = { none: 's-none', learning: 's-learning', memorized: 's-memorized' };
 
 // ── DOM 참조 ────────────────────────────────────
-const $loading    = document.getElementById('loading');
-const $app        = document.getElementById('app');
-const $verseList  = document.getElementById('verse-list');
-const $progress   = document.getElementById('progress');
-const $revealAll  = document.getElementById('reveal-all');
-const $fdn        = document.getElementById('fdn');
-const $fup        = document.getElementById('fup');
+const $loading     = document.getElementById('loading');
+const $app         = document.getElementById('app');
+const $verseList   = document.getElementById('verse-list');
+const $progress    = document.getElementById('progress');
+const $revealAll   = document.getElementById('reveal-all');
+const $fdn         = document.getElementById('fdn');
+const $fup         = document.getElementById('fup');
+const $slider      = document.getElementById('verse-slider');
+const $sliderLabel = document.getElementById('slider-label');
 
 // ── 구절 목록 렌더링 ────────────────────────────
 function renderList() {
@@ -48,6 +50,30 @@ function changeStage(s) {
   $revealAll.style.display = s > 0 ? 'inline' : 'none';
   renderList();
 }
+
+// ── 위치 슬라이더 ───────────────────────────────
+function scrollToVerse(n) {
+  const items = $verseList.querySelectorAll('li');
+  const target = items[n - 1];
+  if (!target) return;
+  const headerH = document.querySelector('.header').offsetHeight;
+  const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+  const top = target.getBoundingClientRect().top + window.scrollY - headerH - ctrlH - 8;
+  const behavior = navigator.maxTouchPoints > 0 ? 'instant' : 'smooth';
+  window.scrollTo({ top, behavior });
+}
+
+// 드래그 중: 숫자만 업데이트
+$slider.addEventListener('input', () => {
+  $sliderLabel.textContent = `${$slider.value} / ${$slider.max}`;
+});
+
+// 손 놓을 때: 스크롤 + 저장
+$slider.addEventListener('change', () => {
+  const n = +$slider.value;
+  savePos(n);
+  scrollToVerse(n);
+});
 
 // ── 글자 크기 버튼 ──────────────────────────────
 function refreshFontBtns() {
@@ -106,6 +132,13 @@ async function init() {
     $loading.style.display = 'none';
     $app.style.display = '';
     renderList();
+
+    const total = getVerses().length;
+    $slider.max = total;
+    const pos = loadPos();
+    $slider.value = pos;
+    $sliderLabel.textContent = `${pos} / ${total}`;
+    if (pos > 1) setTimeout(() => scrollToVerse(pos), 100);
   } catch (err) {
     $loading.innerHTML =
       '❌ 데이터를 불러올 수 없습니다.<br>' +
