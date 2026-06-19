@@ -110,18 +110,8 @@ $verseList.addEventListener('click', e => {
 // ── 초기화 ──────────────────────────────────────
 async function init() {
   try {
-    const [bRes, b100Res] = await Promise.all([
-      fetch('data/bible.json'),
-      fetch('data/bible_100.json'),
-    ]);
-    const bibleData = await bRes.json();
-    const refs      = await b100Res.json();
-
-    setVerses(
-      refs
-        .map(ref => ({ ref, text: (bibleData[ref] || '').trim() }))
-        .filter(v => v.text)
-    );
+    const verses = await fetch('data/verses.json').then(r => r.json());
+    setVerses(verses);
 
     applySavedSize();
     setSize(getSizeIdx());
