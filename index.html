@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <meta name="theme-color" content="#3b82f6" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -69,7 +71,20 @@
     <script src="js/app.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+          .then(reg => {
+            reg.update(); // 페이지 로드마다 즉시 업데이트 확인
+            const activate = sw => {
+              sw.addEventListener('statechange', () => {
+                if (sw.state === 'activated') window.location.reload();
+              });
+            };
+            if (reg.installing) activate(reg.installing);
+            if (reg.waiting)    reg.waiting.postMessage('skip-waiting');
+            reg.addEventListener('updatefound', () => {
+              activate(reg.installing);
+            });
+          });
         navigator.serviceWorker.addEventListener('message', e => {
           if (e.data === 'sw-updated') window.location.reload();
         });
