@@ -44,6 +44,7 @@ function setStage(s)  { stage = s; revealed = new Set(); }
 function isRevealed(ref)    { return revealed.has(ref); }
 function toggleReveal(ref)  { revealed.has(ref) ? revealed.delete(ref) : revealed.add(ref); }
 function revealAll()        { verses.forEach(v => revealed.add(v.ref)); }
+function hideAll()          { revealed = new Set(); }
 
 // ── 위치 ─────────────────────────────────
 function savePos(i) { try { localStorage.setItem(LS_POS, i); } catch (_) {} }

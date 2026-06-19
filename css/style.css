@@ -121,61 +121,64 @@ body {
 }
 
 .stage-btn.on {
-  background: #2563eb;
+  background: #5b8fba;
   color: #fff;
-  border-color: #2563eb;
+  border-color: #4a7a9b;
 }
 
 .stage-btn:hover:not(.on) { background: #e5e7eb; }
 
-/* 2행: 전체 공개 + 진행률 */
+/* 2행: 전체 공개 + 슬라이더 + 진행률 */
 .ctrl-foot {
-  display: flex;
-  align-items: center;
-  padding: 0 2px;
-}
-
-.reveal-btn {
-  font-size: 0.8em;
-  color: #2563eb;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: none;
-  font-weight: 600;
-}
-
-.reveal-btn:hover { text-decoration: underline; }
-
-.progress {
-  margin-left: auto;
-  font-size: 0.85em;
-  color: #6b7280;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* 3행: 위치 슬라이더 */
-.slider-row {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 2px;
 }
 
-#slider-label {
-  min-width: 52px;
-  font-size: 0.85em;
-  font-weight: 700;
-  color: #2563eb;
-  text-align: right;
+.reveal-btn {
+  font-size: 0.8em;
+  color: #5b8fba;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: none;
+  font-weight: 600;
   white-space: nowrap;
+  width: 6rem;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+@media (hover: hover) {
+  .reveal-btn:hover { opacity: 0.7; }
 }
 
 #verse-slider {
   flex: 1;
-  accent-color: #2563eb;
+  accent-color: #5b8fba;
   cursor: pointer;
+}
+
+.ctrl-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+#slider-label {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #5b8fba;
+  white-space: nowrap;
+}
+
+.progress {
+  font-size: 0.75em;
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ── 구절 목록 ── */
@@ -185,44 +188,33 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .verse-row {
-  position: relative;
-  padding: 14px 12px 12px;
+  padding: 8px 10px 10px;
   background: #fff;
   border-radius: 10px;
-  border: 1.5px solid #93c5fd;
+  border: 1.5px solid #a8c8e0;
 }
 
-/* 짝수 행: 연한 하늘색 배경 */
+/* 짝수 행: 연한 스틸블루 배경 */
 .verse-row:nth-child(even) {
-  background: #f0f9ff;
-  border-color: #7dd3fc;
+  background: #eef5fb;
+  border-color: #8bbad4;
 }
 
-.verse-row:nth-child(even) .verse-ref {
-  background: #f0f9ff;
+.verse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
 .verse-ref {
-  position: absolute;
-  top: -0.7em;
-  left: 12px;
-  background: #fff;
-  padding: 0 6px;
-  color: #2563eb;
+  color: #5b8fba;
   font-size: 0.85em;
   font-weight: 800;
-  line-height: 1.4;
-  border-radius: 4px;
-}
-
-.verse-body {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
 }
 
 .verse-text {
@@ -260,17 +252,13 @@ body {
 }
 
 .status-btn {
-  flex-shrink: 0;
-  min-width: 52px;
-  padding: 7px 10px;
-  border-radius: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
   border: none;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all .12s;
-  align-self: flex-start;
-  margin-top: 1px;
 }
 
 .s-none      { background: #f3f4f6; color: #9ca3af; }

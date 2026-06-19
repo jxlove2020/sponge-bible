@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta name="theme-color" content="#3b82f6" />
+    <meta name="theme-color" content="#5b8fba" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -46,15 +46,14 @@
             <button class="stage-btn" data-s="2" title="어구 가리기">2단계</button>
             <button class="stage-btn" data-s="3" title="전체 가리기">3단계</button>
           </div>
-          <!-- 2행: 보조 버튼 + 진행률 -->
+          <!-- 2행: 전체 공개 + 슬라이더 + 진행률 -->
           <div class="ctrl-foot">
-            <button class="reveal-btn" id="reveal-all">👁 전체 공개</button>
-            <span class="progress" id="progress">완료 0/0</span>
-          </div>
-          <!-- 3행: 위치 슬라이더 -->
-          <div class="slider-row">
+            <button class="reveal-btn" id="reveal-all">🫣 전체 공개</button>
             <input type="range" id="verse-slider" min="1" max="100" value="1" />
-            <span id="slider-label">1 / 100</span>
+            <div class="ctrl-info">
+              <span id="slider-label">1/100</span>
+              <span class="progress" id="progress">완료 0</span>
+            </div>
           </div>
         </div>
       </div>

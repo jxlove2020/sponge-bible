@@ -20,12 +20,15 @@ const $slider      = document.getElementById('verse-slider');
 const $sliderLabel = document.getElementById('slider-label');
 
 // ── 구절 목록 렌더링 ────────────────────────────
+let isRendering = false;
 function renderList() {
+  isRendering = true;
+  requestAnimationFrame(() => { isRendering = false; });
   const verses = getVerses();
   const stg    = getStage();
   const done   = verses.filter(v => getStat(v.ref) === 'memorized').length;
 
-  $progress.textContent = `완료 ${done}/${verses.length}`;
+  $progress.textContent = `완료 ${done}`;
 
   $verseList.innerHTML = verses.map(v => {
     const st  = getStat(v.ref);
@@ -33,11 +36,11 @@ function renderList() {
     const txt = renderMasked(v.text, stg, rev);
     const clk = stg > 0 ? ' click' : '';
     return `<li class="verse-row">
-      <span class="verse-ref">${esc(v.ref)}</span>
-      <div class="verse-body">
-        <span class="verse-text${clk}" data-r="${esc(v.ref)}">${txt}</span>
+      <div class="verse-header">
+        <span class="verse-ref">${esc(v.ref)}</span>
         <button class="status-btn ${STATUS_CLASS[st]}" data-st="${esc(v.ref)}">${STATUS_LABEL[st]}</button>
       </div>
+      <span class="verse-text${clk}" data-r="${esc(v.ref)}">${txt}</span>
     </li>`;
   }).join('');
 }
@@ -48,6 +51,7 @@ function changeStage(s) {
   document.querySelectorAll('.stage-btn')
     .forEach(b => b.classList.toggle('on', +b.dataset.s === s));
   $revealAll.style.display = s > 0 ? 'inline' : 'none';
+  $revealAll.textContent = '🫣 전체 공개';
   renderList();
 }
 
@@ -75,6 +79,28 @@ $slider.addEventListener('change', () => {
   scrollToVerse(n);
 });
 
+// 스크롤 → 슬라이더 연동
+let scrollTicking = false;
+window.addEventListener('scroll', () => {
+  if (scrollTicking || isRendering) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    const items = $verseList.querySelectorAll('li');
+    const headerH = document.querySelector('.header').offsetHeight;
+    const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+    const threshold = headerH + ctrlH + 20;
+    let current = 1;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].getBoundingClientRect().top <= threshold) current = i + 1;
+      else break;
+    }
+    $slider.value = current;
+    $sliderLabel.textContent = `${current} / ${$slider.max}`;
+    savePos(current);
+    scrollTicking = false;
+  });
+});
+
 // ── 글자 크기 버튼 ──────────────────────────────
 function refreshFontBtns() {
   const i = getSizeIdx();
@@ -89,7 +115,17 @@ $fup.addEventListener('click', () => { setSize(getSizeIdx() + 1); refreshFontBtn
 document.querySelectorAll('.stage-btn')
   .forEach(b => b.addEventListener('click', () => changeStage(+b.dataset.s)));
 
-$revealAll.addEventListener('click', () => { revealAll(); renderList(); });
+$revealAll.addEventListener('click', () => {
+  const allRevealed = getVerses().every(v => isRevealed(v.ref));
+  if (allRevealed) {
+    hideAll();
+    $revealAll.textContent = '🫣 전체 공개';
+  } else {
+    revealAll();
+    $revealAll.textContent = '🙈 다시 가리기';
+  }
+  renderList();
+});
 
 // ── 구절 목록 클릭 이벤트 위임 ─────────────────
 $verseList.addEventListener('click', e => {
