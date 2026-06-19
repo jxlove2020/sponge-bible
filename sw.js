@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v2';
+const CACHE = 'sponge-bible-v3';
 
 // 설치 시 반드시 캐싱해야 하는 앱 셸
 const SHELL = [
