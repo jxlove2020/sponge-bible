@@ -72,7 +72,7 @@
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
           .then(reg => {
-            reg.update(); // 페이지 로드마다 즉시 업데이트 확인
+            reg.update();
             const activate = sw => {
               sw.addEventListener('statechange', () => {
                 if (sw.state === 'activated') window.location.reload();
@@ -82,6 +82,9 @@
             if (reg.waiting)    reg.waiting.postMessage('skip-waiting');
             reg.addEventListener('updatefound', () => {
               activate(reg.installing);
+            });
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'visible') reg.update();
             });
           });
         navigator.serviceWorker.addEventListener('message', e => {

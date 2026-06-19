@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v19';
+const CACHE = 'sponge-bible-v20';
 
 const SHELL = [
   './css/style.css',
