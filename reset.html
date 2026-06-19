@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>초기화 중…</title>
+    <title>초기화</title>
     <style>
       body {
         font-family: -apple-system, sans-serif;
@@ -15,22 +15,61 @@
         margin: 0;
         background: #f9fafb;
         color: #374151;
-        gap: 16px;
+        gap: 12px;
+        padding: 24px;
+        text-align: center;
       }
-      p { font-size: 16px; }
+      #log { font-size: 14px; color: #6b7280; line-height: 2; }
+      #go {
+        margin-top: 16px;
+        padding: 12px 28px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <p>🔄 캐시 초기화 중…</p>
+    <div id="log">🔄 초기화 중…</div>
+    <button id="go" onclick="location.replace('./index.html')">앱 열기</button>
     <script>
+      const log = document.getElementById('log');
+      const go  = document.getElementById('go');
+
+      function addLog(msg) { log.innerHTML += '<br>' + msg; }
+
       (async () => {
-        if ('serviceWorker' in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(regs.map(r => r.unregister()));
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            addLog(`SW ${regs.length}개 해제 중…`);
+            await Promise.all(regs.map(r => r.unregister()));
+            addLog('✅ SW 해제 완료');
+          } else {
+            addLog('ℹ️ SW 미지원 브라우저');
+          }
+        } catch (e) {
+          addLog('⚠️ SW 해제 실패: ' + e.message);
         }
-        const keys = await caches.keys();
-        await Promise.all(keys.map(k => caches.delete(k)));
-        location.replace('./index.html');
+
+        try {
+          const keys = await caches.keys();
+          addLog(`캐시 ${keys.length}개 삭제 중…`);
+          await Promise.all(keys.map(k => caches.delete(k)));
+          addLog('✅ 캐시 삭제 완료');
+        } catch (e) {
+          addLog('⚠️ 캐시 삭제 실패: ' + e.message);
+        }
+
+        addLog('✅ 완료! 이동합니다…');
+        setTimeout(() => {
+          location.replace('./index.html');
+        }, 1000);
       })();
     </script>
   </body>
