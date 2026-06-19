@@ -83,9 +83,6 @@
             reg.addEventListener('updatefound', () => {
               activate(reg.installing);
             });
-            document.addEventListener('visibilitychange', () => {
-              if (document.visibilityState === 'visible') reg.update();
-            });
           });
         navigator.serviceWorker.addEventListener('message', e => {
           if (e.data === 'sw-updated') window.location.reload();
