@@ -1,6 +1,5 @@
-const CACHE = 'sponge-bible-v5';
+const CACHE = 'sponge-bible-v6';
 
-// 설치 시 반드시 캐싱해야 하는 앱 셸
 const SHELL = [
   './index.html',
   './css/style.css',
@@ -10,7 +9,6 @@ const SHELL = [
   './data/verses.json',
 ];
 
-// 선택적으로 캐싱 (없어도 설치 실패 안 함)
 const OPTIONAL = [
   './assets/icon.png',
   './assets/logo.png',
@@ -20,7 +18,6 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(async c => {
       await c.addAll(SHELL);
-      // 선택 파일은 실패해도 무시
       await Promise.allSettled(OPTIONAL.map(url => c.add(url)));
     })
   );
@@ -28,11 +25,12 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(c => c.postMessage('sw-updated'));
+  })());
   self.clients.claim();
 });
 
