@@ -68,6 +68,6 @@ function applySavedSize() {
 }
 function setSize(i) {
   sIdx = Math.max(0, Math.min(SIZES.length - 1, i));
-  document.documentElement.style.fontSize = SIZES[sIdx];
+  document.querySelector('.verse-wrap').style.fontSize = SIZES[sIdx];
   try { localStorage.setItem(LS_SIZE, SIZES[sIdx]); } catch (_) {}
 }

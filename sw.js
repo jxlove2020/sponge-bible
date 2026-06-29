@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v22';
+const CACHE = 'sponge-bible-v26';
 
 const SHELL = [
   './',
@@ -24,10 +24,10 @@ self.addEventListener('activate', e => {
       await c.addAll(SHELL);
       await Promise.allSettled(OPTIONAL.map(url => c.add(url)));
     });
+    await self.clients.claim();
     const clients = await self.clients.matchAll({ type: 'window' });
     clients.forEach(c => c.postMessage('sw-updated'));
   })());
-  self.clients.claim();
 });
 
 self.addEventListener('message', e => {
