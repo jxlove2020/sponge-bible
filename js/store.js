@@ -38,13 +38,20 @@ function _saveStat() {
 
 // ── 마스킹 단계 ──────────────────────────
 function getStage()   { return stage; }
-function setStage(s)  { stage = s; revealed = new Set(); }
+function setStage(s)  { stage = s; revealed = new Set(); clearAllStage2Flips(); }
 
 // ── 공개(reveal) 집합 ─────────────────────
 function isRevealed(ref)    { return revealed.has(ref); }
-function toggleReveal(ref)  { revealed.has(ref) ? revealed.delete(ref) : revealed.add(ref); }
+function toggleReveal(ref) {
+  if (revealed.has(ref)) {
+    revealed.delete(ref);
+    clearStage2Flip(ref);   // 다시 가릴 때 새 랜덤 패턴 적용
+  } else {
+    revealed.add(ref);
+  }
+}
 function revealAll()        { verses.forEach(v => revealed.add(v.ref)); }
-function hideAll()          { revealed = new Set(); }
+function hideAll()          { revealed = new Set(); clearAllStage2Flips(); }
 
 // ── 위치 ─────────────────────────────────
 function savePos(i) { try { localStorage.setItem(LS_POS, i); } catch (_) {} }

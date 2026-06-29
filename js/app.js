@@ -18,6 +18,9 @@ const $fdn         = document.getElementById('fdn');
 const $fup         = document.getElementById('fup');
 const $slider      = document.getElementById('verse-slider');
 const $sliderLabel = document.getElementById('slider-label');
+const $phraseRow   = document.getElementById('phrase-row');
+
+let phraseSize = 1;
 
 // ── 구절 목록 렌더링 ────────────────────────────
 let isRendering = false;
@@ -33,7 +36,7 @@ function renderList() {
   $verseList.innerHTML = verses.map(v => {
     const st  = getStat(v.ref);
     const rev = isRevealed(v.ref);
-    const txt = renderMasked(v.text, stg, rev);
+    const txt = renderMasked(v.text, stg, rev, v.ref, phraseSize);
     const clk = stg > 0 ? ' click' : '';
     return `<li class="verse-row">
       <div class="verse-header">
@@ -52,8 +55,20 @@ function changeStage(s) {
     .forEach(b => b.classList.toggle('on', +b.dataset.s === s));
   $revealAll.style.display = s > 0 ? 'inline' : 'none';
   $revealAll.textContent = '🫣 전체 공개';
+  $phraseRow.style.display = s === 2 ? 'flex' : 'none';
   renderList();
 }
+
+// ── 2단계 어절 단위 토글 ─────────────────────────
+document.querySelectorAll('.phrase-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    phraseSize = +b.dataset.ps;
+    document.querySelectorAll('.phrase-btn')
+      .forEach(x => x.classList.toggle('on', +x.dataset.ps === phraseSize));
+    clearAllStage2Flips();
+    renderList();
+  });
+});
 
 // ── 위치 슬라이더 ───────────────────────────────
 function scrollToVerse(n) {

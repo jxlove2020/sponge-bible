@@ -1,6 +1,7 @@
-const CACHE = 'sponge-bible-v21';
+const CACHE = 'sponge-bible-v22';
 
 const SHELL = [
+  './',
   './css/style.css',
   './js/masking.js',
   './js/store.js',

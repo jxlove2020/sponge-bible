@@ -43,7 +43,13 @@
           <div class="stage-row">
             <button class="stage-btn on" data-s="0">전체 보기</button>
             <button class="stage-btn" data-s="1" title="명사 가리기">1단계</button>
-            <button class="stage-btn" data-s="2" title="어구 가리기">2단계</button>
+            <div class="stage-cell">
+              <button class="stage-btn" data-s="2" title="어구 가리기">2단계</button>
+              <div class="phrase-row" id="phrase-row" style="display:none">
+                <button class="phrase-btn on" data-ps="1">1어절</button>
+                <button class="phrase-btn" data-ps="2">2어절</button>
+              </div>
+            </div>
             <button class="stage-btn" data-s="3" title="전체 가리기">3단계</button>
           </div>
           <!-- 2행: 전체 공개 + 슬라이더 + 진행률 -->

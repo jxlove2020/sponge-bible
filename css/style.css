@@ -128,6 +128,45 @@ body {
 
 .stage-btn:hover:not(.on) { background: #e5e7eb; }
 
+/* 2단계 버튼 wrapper: 버튼 + 어절 토글을 세로로 묶음 */
+.stage-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stage-cell > .stage-btn {
+  width: 100%;
+}
+
+/* 어절 토글: 2단계 버튼 바로 아래 */
+.phrase-row {
+  display: flex;
+  gap: 4px;
+}
+
+.phrase-btn {
+  flex: 1;
+  padding: 0.28em 0;
+  border-radius: 6px;
+  border: 1.5px solid #c8dff0;
+  background: #eef5fb;
+  color: #5b8fba;
+  font-size: 0.78em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .12s;
+}
+
+.phrase-btn.on {
+  background: #5b8fba;
+  color: #fff;
+  border-color: #4a7a9b;
+}
+
+.phrase-btn:hover:not(.on) { background: #dbedf7; }
+
 /* 2행: 전체 공개 + 슬라이더 + 진행률 */
 .ctrl-foot {
   display: flex;
