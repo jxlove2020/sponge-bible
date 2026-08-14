@@ -38,6 +38,8 @@ body {
   font-size: 13px;
   font-weight: 700;
   color: #1f2937;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .header-center {
@@ -254,7 +256,11 @@ body {
   overflow-wrap: anywhere;
 }
 
-.verse-text.click { cursor: pointer; }
+.verse-text.click {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 .masked {
   display: inline-block;
