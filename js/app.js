@@ -161,7 +161,7 @@ $verseList.addEventListener('click', e => {
 // ── 초기화 ──────────────────────────────────────
 async function init() {
   try {
-    const verses = await fetch('data/verses.json').then(r => r.json());
+    const verses = await fetch(`data/verses.json?v=${Date.now()}`).then(r => r.json());
     setVerses(verses);
 
     applySavedSize();
