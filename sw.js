@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v29';
+const CACHE = 'sponge-bible-v44';
 
 const SHELL = ['./', './css/style.css', './js/masking.js', './js/store.js', './js/app.js', './data/verses.json'];
 

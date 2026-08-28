@@ -19,8 +19,135 @@ const $fup         = document.getElementById('fup');
 const $slider      = document.getElementById('verse-slider');
 const $sliderLabel = document.getElementById('slider-label');
 const $phraseRow   = document.getElementById('phrase-row');
+const $playAllBtn  = document.getElementById('play-all');
 
 let phraseSize = 1;
+
+// ── 오디오 재생 상태 ────────────────────────────
+let audioPlayer = null;
+let audioPlayingFile = '';
+let isPlaylistActive = false;
+let playlistIdx = 0;
+let playlistVerses = [];
+let repeatFile = '';
+let preloadAudio = null;
+
+function preloadFile(audioFile) {
+  if (preloadAudio) preloadAudio.src = '';
+  preloadAudio = new Audio(`sound/${audioFile}`);
+  preloadAudio.preload = 'auto';
+  preloadAudio.load();
+}
+
+function playAudioFile(audioFile, onEnded) {
+  if (audioPlayer) {
+    audioPlayer.pause();
+    const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
+    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+  }
+
+  audioPlayingFile = audioFile;
+
+  if (preloadAudio && preloadAudio.src.split('/').pop() === audioFile) {
+    audioPlayer = preloadAudio;
+    preloadAudio = null;
+  } else {
+    audioPlayer = new Audio(`sound/${audioFile}`);
+    audioPlayer.preload = 'auto';
+  }
+
+  audioPlayer.loop = (repeatFile === audioFile && !onEnded);
+
+  const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
+  if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
+
+  const doPlay = () => {
+    if (audioPlayingFile === audioFile) audioPlayer.play().catch(() => {});
+  };
+  if (audioPlayer.readyState >= 3) {
+    doPlay();
+  } else {
+    audioPlayer.addEventListener('canplay', doPlay, { once: true });
+  }
+
+  audioPlayer.addEventListener('ended', () => {
+    if (audioPlayingFile === audioFile) {
+      audioPlayingFile = '';
+      const b = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
+      if (b) { b.textContent = '▶'; b.classList.remove('playing'); }
+    }
+    if (onEnded) onEnded();
+  });
+}
+
+function stopPlaylist() {
+  isPlaylistActive = false;
+  $playAllBtn.textContent = '▶ 전체';
+  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
+  if (audioPlayer) {
+    audioPlayer.pause();
+    const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
+    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+    audioPlayer = null;
+    audioPlayingFile = '';
+  }
+}
+
+function playNextInPlaylist() {
+  if (!isPlaylistActive || playlistIdx >= playlistVerses.length) {
+    stopPlaylist();
+    return;
+  }
+  const v = playlistVerses[playlistIdx];
+  playlistIdx++;
+
+  const fullIdx = getVerses().findIndex(gv => gv.ref === v.ref);
+  if (fullIdx >= 0) scrollToVerse(fullIdx + 1);
+
+  playAudioFile(v.audio, () => { if (isPlaylistActive) playNextInPlaylist(); });
+
+  if (playlistIdx < playlistVerses.length) {
+    preloadFile(playlistVerses[playlistIdx].audio);
+  }
+}
+
+$playAllBtn.addEventListener('click', () => {
+  if (isPlaylistActive) {
+    stopPlaylist();
+    return;
+  }
+  playlistVerses = getVerses().filter(v => v.audio);
+  playlistIdx = 0;
+  isPlaylistActive = true;
+  $playAllBtn.textContent = '⏹ 정지';
+
+  if (playlistVerses.length > 0) {
+    preloadFile(playlistVerses[0].audio);
+  }
+  playNextInPlaylist();
+});
+
+function handleAudio(btn) {
+  const audioFile = btn.dataset.audio;
+  if (!audioFile) return;
+
+  if (isPlaylistActive) stopPlaylist();
+
+  if (audioPlayingFile === audioFile && audioPlayer) {
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      btn.textContent = '⏸';
+      btn.classList.add('playing');
+    } else {
+      audioPlayer.pause();
+      btn.textContent = '▶';
+      btn.classList.remove('playing');
+    }
+    return;
+  }
+
+  playAudioFile(audioFile, null);
+}
 
 // ── 구절 목록 렌더링 ────────────────────────────
 let isRendering = false;
@@ -38,14 +165,28 @@ function renderList() {
     const rev = isRevealed(v.ref);
     const txt = renderMasked(v.text, stg, rev, v.ref, phraseSize);
     const clk = stg > 0 ? ' click' : '';
+    const audioBtn = v.audio
+      ? `<button class="audio-btn" data-audio="${esc(v.audio)}" title="듣기">▶</button>`
+      : '';
+    const repeatBtn = v.audio
+      ? `<button class="repeat-btn${repeatFile === v.audio ? ' active' : ''}" data-repeat="${esc(v.audio)}" title="반복">↺</button>`
+      : '';
     return `<li class="verse-row">
       <div class="verse-header">
         <span class="verse-ref">${esc(v.ref)}</span>
-        <button class="status-btn ${STATUS_CLASS[st]}" data-st="${esc(v.ref)}">${STATUS_LABEL[st]}</button>
+        <div class="verse-actions">
+          ${audioBtn}${repeatBtn}
+          <button class="status-btn ${STATUS_CLASS[st]}" data-st="${esc(v.ref)}">${STATUS_LABEL[st]}</button>
+        </div>
       </div>
       <span class="verse-text${clk}" data-r="${esc(v.ref)}">${txt}</span>
     </li>`;
   }).join('');
+
+  if (audioPlayingFile && audioPlayer && !audioPlayer.paused) {
+    const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
+    if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
+  }
 }
 
 // ── 단계 변경 ───────────────────────────────────
@@ -144,9 +285,30 @@ $revealAll.addEventListener('click', () => {
 
 // ── 구절 목록 클릭 이벤트 위임 ─────────────────
 $verseList.addEventListener('click', e => {
+  const aEl = e.target.closest('.audio-btn');
+  const rEl = e.target.closest('.repeat-btn');
   const tEl = e.target.closest('[data-r]');
   const sEl = e.target.closest('[data-st]');
 
+  if (aEl) {
+    handleAudio(aEl);
+    return;
+  }
+  if (rEl) {
+    const file = rEl.dataset.repeat;
+    if (repeatFile === file) {
+      repeatFile = '';
+      if (audioPlayer && audioPlayingFile === file) audioPlayer.loop = false;
+      rEl.classList.remove('active');
+    } else {
+      const old = $verseList.querySelector(`.repeat-btn[data-repeat="${CSS.escape(repeatFile)}"]`);
+      if (old) old.classList.remove('active');
+      repeatFile = file;
+      if (audioPlayer && audioPlayingFile === file) audioPlayer.loop = true;
+      rEl.classList.add('active');
+    }
+    return;
+  }
   if (tEl && getStage() > 0) {
     toggleReveal(tEl.dataset.r);
     renderList();

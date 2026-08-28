@@ -178,6 +178,52 @@ body {
   flex-shrink: 0;
 }
 
+.play-all-btn {
+  font-size: 0.8em;
+  color: #5b8fba;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.play-all-btn.active {
+  color: #ef4444;
+}
+
+@media (hover: hover) {
+  .play-all-btn:hover { opacity: 0.7; }
+}
+
+.repeat-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid #e5e7eb;
+  background: transparent;
+  color: #c9d1db;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.repeat-btn.active {
+  border-color: #5b8fba;
+  color: #5b8fba;
+}
+
+@media (hover: hover) {
+  .repeat-btn:hover:not(.active) { border-color: #9ca3af; color: #9ca3af; }
+  .repeat-btn.active:hover { opacity: 0.85; }
+}
+
 @media (hover: hover) {
   .reveal-btn:hover { opacity: 0.7; }
 }
@@ -239,6 +285,66 @@ body {
   margin-bottom: 4px;
 }
 
+.verse-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.audio-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #dbedf7;
+  color: #5b8fba;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.audio-btn.playing {
+  background: #5b8fba;
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .audio-btn:hover { opacity: 0.85; }
+}
+
+.repeat-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #c9d1db;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.repeat-btn.active {
+  background: #5b8fba;
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .repeat-btn:hover:not(.active) { color: #9ca3af; }
+  .repeat-btn.active:hover { opacity: 0.85; }
+}
+
 .verse-ref {
   color: #5b8fba;
   font-size: 0.85em;
@@ -284,13 +390,15 @@ body {
 }
 
 .status-btn {
-  padding: 3px 10px;
+  min-width: 52px;
+  padding: 3px 6px;
   border-radius: 20px;
   border: none;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all .12s;
+  text-align: center;
 }
 
 .s-none      { background: #f3f4f6; color: #9ca3af; }
