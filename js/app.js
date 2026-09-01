@@ -256,6 +256,16 @@ document.querySelectorAll('.phrase-btn').forEach(b => {
 });
 
 // ── 위치 슬라이더 ───────────────────────────────
+// 마지막 구절이 기준선까지 스크롤될 수 있도록 하단 여백 설정
+// vh 대신 window.innerHeight 사용: iOS Safari에서 100vh ≠ 실제 가시 영역
+function setVerseWrapPadding() {
+  const headerH = document.querySelector('.header').offsetHeight;
+  const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+  const pad = window.innerHeight - headerH - ctrlH - 20;
+  document.querySelector('.verse-wrap').style.paddingBottom = Math.max(pad, 60) + 'px';
+}
+window.addEventListener('resize', setVerseWrapPadding);
+
 function scrollToVerse(n) {
   const items = $verseList.querySelectorAll('li');
   const target = items[n - 1];
@@ -264,11 +274,7 @@ function scrollToVerse(n) {
   const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
   const top = target.getBoundingClientRect().top + window.scrollY - headerH - ctrlH - 8;
   const behavior = navigator.maxTouchPoints > 0 ? 'instant' : 'smooth';
-  autoScrolling = true;
-  clearTimeout(autoScrollTimer);
   window.scrollTo({ top, behavior });
-  // smooth scroll은 최대 ~700ms, instant는 즉시 완료
-  autoScrollTimer = setTimeout(() => { autoScrolling = false; }, behavior === 'smooth' ? 800 : 50);
 }
 
 // 드래그 중: 숫자만 업데이트
@@ -305,8 +311,6 @@ $slider.addEventListener('change', () => {
 // 스크롤 → 슬라이더 연동
 let scrollTicking = false;
 let scrollSeekTimer = null;
-let autoScrolling = false;  // 플레이리스트가 자동 스크롤 중이면 seek 억제
-let autoScrollTimer = null;
 window.addEventListener('scroll', () => {
   if (scrollTicking || isRendering) return;
   scrollTicking = true;
@@ -325,8 +329,7 @@ window.addEventListener('scroll', () => {
     savePos(current);
     scrollTicking = false;
 
-    // 플레이리스트 자동 스크롤 중에는 seek 억제 (마지막 구절이 top 기준선에 못 닿아 역행 방지)
-    if (isPlaylistActive && !autoScrolling) {
+    if (isPlaylistActive) {
       clearTimeout(scrollSeekTimer);
       scrollSeekTimer = setTimeout(() => seekPlaylistTo(current), 1000);
     }
@@ -411,6 +414,7 @@ async function init() {
     $loading.style.display = 'none';
     $app.style.display = '';
     renderList();
+    setVerseWrapPadding();
 
     const total = getVerses().length;
     $slider.max = total;
