@@ -104,6 +104,7 @@ function updatePlayBtnState() {
 
 function stopPlaylist() {
   isPlaylistActive = false;
+  clearTimeout(scrollSeekTimer);  // 버그3: 미정리 타이머 취소
   if (audioPlayingFile && playlistIdx > 0) {
     playlistIdx--;
   }
@@ -164,6 +165,7 @@ $playAllBtn.addEventListener('click', () => {
   }
   isPlaylistActive = true;
   $playAllBtn.textContent = '⏹ 정지';
+  $playResetBtn.style.display = 'none';  // 버그1: 재생 중 ↩처음 버튼 숨김
 
   if (playlistIdx < playlistVerses.length) {
     preloadFile(playlistVerses[playlistIdx].audio);
@@ -283,6 +285,7 @@ $slider.addEventListener('input', () => {
 });
 
 function seekPlaylistTo(n) {
+  if (!isPlaylistActive) return;  // 버그2: 비활성 상태에서 타이머 실행 방지
   const startVerse = getVerses()[n - 1];
   if (!startVerse) return;
   const idx = playlistVerses.findIndex(v => v.ref === startVerse.ref);
@@ -402,7 +405,10 @@ $verseList.addEventListener('click', e => {
 // ── 초기화 ──────────────────────────────────────
 async function init() {
   try {
-    const verses = await fetch(`data/verses.json?v=${Date.now()}`).then(r => r.json());
+    const verses = await fetch(`data/verses.json?v=${Date.now()}`).then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    });
     setVerses(verses);
 
     applySavedSize();

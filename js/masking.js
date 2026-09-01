@@ -54,10 +54,11 @@ function makeSegs(text, stage, ref = '', phraseSize = 1) {
   return out;
 }
 
-/** HTML 특수문자 이스케이프 */
+/** HTML 특수문자 이스케이프 (속성값 포함) */
 function esc(s) {
   return String(s)
     .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
