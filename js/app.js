@@ -63,10 +63,13 @@ function playAudioFile(audioFile, onEnded) {
   if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
 
   const doPlay = () => {
-    if (audioPlayingFile === audioFile) audioPlayer.play().catch(() => {});
+    if (audioPlayingFile === audioFile) {
+      audioPlayer.currentTime = 0;
+      audioPlayer.play().catch(() => {});
+    }
   };
   if (audioPlayer.readyState >= 3) {
-    doPlay();
+    setTimeout(doPlay, 0);
   } else {
     audioPlayer.addEventListener('canplay', doPlay, { once: true });
   }
