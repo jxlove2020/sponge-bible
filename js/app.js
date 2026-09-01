@@ -31,15 +31,32 @@ let isPlaylistActive = false;
 let playlistIdx = 0;
 let playlistVerses = [];
 let repeatFile = '';
+let preloadAudio = null;
 
-// SW 캐시를 미리 워밍: 별도 Audio 엘리먼트 없이 fetch로 캐싱만 함
 function preloadFile(audioFile) {
-  fetch(`sound/${audioFile}`).catch(() => {});
+  if (preloadAudio) preloadAudio.src = '';
+  const audio = new Audio(`sound/${audioFile}`);
+  preloadAudio = audio;
+  audio.preload = 'auto';
+  audio.load();
+  // 플레이리스트 컨텍스트에서는 미디어 재생 중 autoplay가 허용되므로
+  // canplay 시점에 볼륨=0으로 play→pause하여 파이프라인을 미리 초기화
+  audio.addEventListener('canplay', () => {
+    if (preloadAudio !== audio) return;
+    audio.volume = 0;
+    audio.play().then(() => {
+      if (preloadAudio === audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+      }
+    }).catch(() => {});
+  }, { once: true });
 }
 
 function playAudioFile(audioFile, onEnded) {
   if (audioPlayer) {
-    audioPlayer.onended = null; // 이전 ended 핸들러 제거 (엘리먼트 재사용 시 중복 호출 방지)
+    audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
     if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
@@ -47,16 +64,15 @@ function playAudioFile(audioFile, onEnded) {
 
   audioPlayingFile = audioFile;
 
-  if (onEnded && audioPlayer) {
-    // 플레이리스트: 같은 엘리먼트의 src만 교체 → 오디오 파이프라인 유지 → 처음 뭉개짐 없음
-    audioPlayer.src = `sound/${audioFile}`;
-    audioPlayer.loop = false;
+  if (preloadAudio && preloadAudio.src.split('/').pop() === audioFile) {
+    audioPlayer = preloadAudio;
+    preloadAudio = null;
   } else {
-    // 개별 재생 또는 첫 재생: 새 엘리먼트 생성
     audioPlayer = new Audio(`sound/${audioFile}`);
     audioPlayer.preload = 'auto';
-    audioPlayer.loop = (repeatFile === audioFile && !onEnded);
   }
+
+  audioPlayer.loop = (repeatFile === audioFile && !onEnded);
 
   const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
   if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
@@ -64,7 +80,11 @@ function playAudioFile(audioFile, onEnded) {
   const doPlay = () => {
     if (audioPlayingFile === audioFile) audioPlayer.play().catch(() => {});
   };
-  audioPlayer.addEventListener('canplay', doPlay, { once: true });
+  if (audioPlayer.readyState >= 3) {
+    doPlay();
+  } else {
+    audioPlayer.addEventListener('canplay', doPlay, { once: true });
+  }
 
   audioPlayer.onended = () => {
     if (audioPlayingFile === audioFile) {
@@ -88,6 +108,7 @@ function stopPlaylist() {
     playlistIdx--;
   }
   updatePlayBtnState();
+  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
   if (audioPlayer) {
     audioPlayer.onended = null;
     audioPlayer.pause();
@@ -243,7 +264,11 @@ function scrollToVerse(n) {
   const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
   const top = target.getBoundingClientRect().top + window.scrollY - headerH - ctrlH - 8;
   const behavior = navigator.maxTouchPoints > 0 ? 'instant' : 'smooth';
+  autoScrolling = true;
+  clearTimeout(autoScrollTimer);
   window.scrollTo({ top, behavior });
+  // smooth scroll은 최대 ~700ms, instant는 즉시 완료
+  autoScrollTimer = setTimeout(() => { autoScrolling = false; }, behavior === 'smooth' ? 800 : 50);
 }
 
 // 드래그 중: 숫자만 업데이트
@@ -264,6 +289,7 @@ function seekPlaylistTo(n) {
     audioPlayer = null;
     audioPlayingFile = '';
   }
+  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
   playlistIdx = idx;
   playNextInPlaylist();
 }
@@ -279,6 +305,8 @@ $slider.addEventListener('change', () => {
 // 스크롤 → 슬라이더 연동
 let scrollTicking = false;
 let scrollSeekTimer = null;
+let autoScrolling = false;  // 플레이리스트가 자동 스크롤 중이면 seek 억제
+let autoScrollTimer = null;
 window.addEventListener('scroll', () => {
   if (scrollTicking || isRendering) return;
   scrollTicking = true;
@@ -297,7 +325,8 @@ window.addEventListener('scroll', () => {
     savePos(current);
     scrollTicking = false;
 
-    if (isPlaylistActive) {
+    // 플레이리스트 자동 스크롤 중에는 seek 억제 (마지막 구절이 top 기준선에 못 닿아 역행 방지)
+    if (isPlaylistActive && !autoScrolling) {
       clearTimeout(scrollSeekTimer);
       scrollSeekTimer = setTimeout(() => seekPlaylistTo(current), 1000);
     }
