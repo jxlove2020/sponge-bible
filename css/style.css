@@ -212,33 +212,6 @@ body {
   .play-all-btn:hover { opacity: 0.7; }
 }
 
-.repeat-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1.5px solid #e5e7eb;
-  background: transparent;
-  color: #c9d1db;
-  font-size: 11px;
-  cursor: pointer;
-  transition: all .15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-.repeat-btn.active {
-  border-color: #5b8fba;
-  color: #5b8fba;
-}
-
-@media (hover: hover) {
-  .repeat-btn:hover:not(.active) { border-color: #9ca3af; color: #9ca3af; }
-  .repeat-btn.active:hover { opacity: 0.85; }
-}
-
 @media (hover: hover) {
   .reveal-btn:hover { opacity: 0.7; }
 }
@@ -338,8 +311,8 @@ body {
   height: 26px;
   border-radius: 50%;
   border: none;
-  background: transparent;
-  color: #c9d1db;
+  background: #e5e7eb;
+  color: #9ca3af;
   font-size: 14px;
   cursor: pointer;
   transition: all .15s;
@@ -356,7 +329,7 @@ body {
 }
 
 @media (hover: hover) {
-  .repeat-btn:hover:not(.active) { color: #9ca3af; }
+  .repeat-btn:hover:not(.active) { background: #d1d5db; color: #6b7280; }
   .repeat-btn.active:hover { opacity: 0.85; }
 }
 
