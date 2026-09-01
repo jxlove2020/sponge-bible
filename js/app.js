@@ -20,6 +20,7 @@ const $slider      = document.getElementById('verse-slider');
 const $sliderLabel = document.getElementById('slider-label');
 const $phraseRow   = document.getElementById('phrase-row');
 const $playAllBtn  = document.getElementById('play-all');
+const $playResetBtn = document.getElementById('play-reset');
 
 let phraseSize = 1;
 
@@ -80,9 +81,18 @@ function playAudioFile(audioFile, onEnded) {
   });
 }
 
+function updatePlayBtnState() {
+  const hasResume = playlistIdx > 0 && playlistIdx < playlistVerses.length;
+  $playAllBtn.textContent = hasResume ? '▶ 이어서' : '▶ 전체';
+  $playResetBtn.style.display = hasResume ? 'inline' : 'none';
+}
+
 function stopPlaylist() {
   isPlaylistActive = false;
-  $playAllBtn.textContent = '▶ 전체';
+  if (audioPlayingFile && playlistIdx > 0) {
+    playlistIdx--;
+  }
+  updatePlayBtnState();
   if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
   if (audioPlayer) {
     audioPlayer.pause();
@@ -111,18 +121,36 @@ function playNextInPlaylist() {
   }
 }
 
+$playResetBtn.addEventListener('click', () => {
+  playlistIdx = 0;
+  $slider.value = 1;
+  $sliderLabel.textContent = `1 / ${$slider.max}`;
+  savePos(1);
+  scrollToVerse(1);
+  updatePlayBtnState();
+});
+
 $playAllBtn.addEventListener('click', () => {
   if (isPlaylistActive) {
     stopPlaylist();
     return;
   }
   playlistVerses = getVerses().filter(v => v.audio);
-  playlistIdx = 0;
+  const hasResume = playlistIdx > 0 && playlistIdx < playlistVerses.length;
+  if (!hasResume) {
+    const startVerse = getVerses()[+$slider.value - 1];
+    if (startVerse) {
+      const idx = playlistVerses.findIndex(v => v.ref === startVerse.ref);
+      playlistIdx = idx >= 0 ? idx : 0;
+    } else {
+      playlistIdx = 0;
+    }
+  }
   isPlaylistActive = true;
   $playAllBtn.textContent = '⏹ 정지';
 
-  if (playlistVerses.length > 0) {
-    preloadFile(playlistVerses[0].audio);
+  if (playlistIdx < playlistVerses.length) {
+    preloadFile(playlistVerses[playlistIdx].audio);
   }
   playNextInPlaylist();
 });
@@ -228,15 +256,34 @@ $slider.addEventListener('input', () => {
   $sliderLabel.textContent = `${$slider.value} / ${$slider.max}`;
 });
 
-// 손 놓을 때: 스크롤 + 저장
+function seekPlaylistTo(n) {
+  const startVerse = getVerses()[n - 1];
+  if (!startVerse) return;
+  const idx = playlistVerses.findIndex(v => v.ref === startVerse.ref);
+  if (idx < 0 || idx === playlistIdx - 1) return;
+  if (audioPlayer) {
+    audioPlayer.pause();
+    const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
+    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+    audioPlayer = null;
+    audioPlayingFile = '';
+  }
+  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
+  playlistIdx = idx;
+  playNextInPlaylist();
+}
+
+// 손 놓을 때: 스크롤 + 저장 (재생 중이면 해당 위치부터 재생)
 $slider.addEventListener('change', () => {
   const n = +$slider.value;
   savePos(n);
   scrollToVerse(n);
+  if (isPlaylistActive) seekPlaylistTo(n);
 });
 
 // 스크롤 → 슬라이더 연동
 let scrollTicking = false;
+let scrollSeekTimer = null;
 window.addEventListener('scroll', () => {
   if (scrollTicking || isRendering) return;
   scrollTicking = true;
@@ -254,6 +301,11 @@ window.addEventListener('scroll', () => {
     $sliderLabel.textContent = `${current} / ${$slider.max}`;
     savePos(current);
     scrollTicking = false;
+
+    if (isPlaylistActive) {
+      clearTimeout(scrollSeekTimer);
+      scrollSeekTimer = setTimeout(() => seekPlaylistTo(current), 1000);
+    }
   });
 });
 
