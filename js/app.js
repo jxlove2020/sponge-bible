@@ -31,30 +31,15 @@ let isPlaylistActive = false;
 let playlistIdx = 0;
 let playlistVerses = [];
 let repeatFile = '';
-let preloadAudio = null;
 
+// SW 캐시를 미리 워밍: 별도 Audio 엘리먼트 없이 fetch로 캐싱만 함
 function preloadFile(audioFile) {
-  if (preloadAudio) preloadAudio.src = '';
-  const audio = new Audio(`sound/${audioFile}`);
-  preloadAudio = audio;
-  audio.preload = 'auto';
-  audio.load();
-  // 오디오 파이프라인 미리 초기화: 처음 play() 호출 시 생기는 시작 지연 방지
-  audio.addEventListener('canplay', () => {
-    if (preloadAudio !== audio) return;
-    audio.volume = 0;
-    audio.play().then(() => {
-      if (preloadAudio === audio) {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-      }
-    }).catch(() => {});
-  }, { once: true });
+  fetch(`sound/${audioFile}`).catch(() => {});
 }
 
 function playAudioFile(audioFile, onEnded) {
   if (audioPlayer) {
+    audioPlayer.onended = null; // 이전 ended 핸들러 제거 (엘리먼트 재사용 시 중복 호출 방지)
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
     if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
@@ -62,39 +47,33 @@ function playAudioFile(audioFile, onEnded) {
 
   audioPlayingFile = audioFile;
 
-  if (preloadAudio && preloadAudio.src.split('/').pop() === audioFile) {
-    audioPlayer = preloadAudio;
-    preloadAudio = null;
+  if (onEnded && audioPlayer) {
+    // 플레이리스트: 같은 엘리먼트의 src만 교체 → 오디오 파이프라인 유지 → 처음 뭉개짐 없음
+    audioPlayer.src = `sound/${audioFile}`;
+    audioPlayer.loop = false;
   } else {
+    // 개별 재생 또는 첫 재생: 새 엘리먼트 생성
     audioPlayer = new Audio(`sound/${audioFile}`);
     audioPlayer.preload = 'auto';
+    audioPlayer.loop = (repeatFile === audioFile && !onEnded);
   }
-
-  audioPlayer.loop = (repeatFile === audioFile && !onEnded);
 
   const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
   if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
 
   const doPlay = () => {
-    if (audioPlayingFile === audioFile) {
-      audioPlayer.currentTime = 0;
-      audioPlayer.play().catch(() => {});
-    }
+    if (audioPlayingFile === audioFile) audioPlayer.play().catch(() => {});
   };
-  if (audioPlayer.readyState >= 3) {
-    setTimeout(doPlay, 0);
-  } else {
-    audioPlayer.addEventListener('canplay', doPlay, { once: true });
-  }
+  audioPlayer.addEventListener('canplay', doPlay, { once: true });
 
-  audioPlayer.addEventListener('ended', () => {
+  audioPlayer.onended = () => {
     if (audioPlayingFile === audioFile) {
       audioPlayingFile = '';
       const b = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
       if (b) { b.textContent = '▶'; b.classList.remove('playing'); }
     }
     if (onEnded) onEnded();
-  });
+  };
 }
 
 function updatePlayBtnState() {
@@ -109,8 +88,8 @@ function stopPlaylist() {
     playlistIdx--;
   }
   updatePlayBtnState();
-  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
   if (audioPlayer) {
+    audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
     if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
@@ -278,13 +257,13 @@ function seekPlaylistTo(n) {
   const idx = playlistVerses.findIndex(v => v.ref === startVerse.ref);
   if (idx < 0 || idx === playlistIdx - 1) return;
   if (audioPlayer) {
+    audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
     if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
     audioPlayer = null;
     audioPlayingFile = '';
   }
-  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
   playlistIdx = idx;
   playNextInPlaylist();
 }

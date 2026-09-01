@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v49';
+const CACHE = 'sponge-bible-v50';
 
 const SHELL = [
   './',
@@ -17,7 +17,7 @@ self.addEventListener('install', e => {
     caches.open(CACHE).then(async c => {
       await c.addAll(SHELL);
       await Promise.allSettled(OPTIONAL.map(url => c.add(url)));
-    })
+    }),
   );
   self.skipWaiting();
 });
@@ -30,7 +30,7 @@ self.addEventListener('activate', e => {
       await self.clients.claim();
       const clients = await self.clients.matchAll({ type: 'window' });
       clients.forEach(c => c.postMessage('sw-updated'));
-    })()
+    })(),
   );
 });
 
@@ -43,11 +43,7 @@ self.addEventListener('fetch', e => {
 
   if (e.request.destination === 'document') {
     // 오프라인 fallback: 해당 URL → 루트('/')순으로 시도
-    e.respondWith(
-      fetch(e.request).catch(() =>
-        caches.match(e.request).then(r => r || caches.match('./'))
-      )
-    );
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request).then(r => r || caches.match('./'))));
     return;
   }
 
@@ -66,14 +62,11 @@ self.addEventListener('fetch', e => {
           }
           return res;
         });
-      })
+      }),
     );
     return;
   }
 
   // ignoreSearch로 ?v=timestamp 캐시버스팅 무시 (verses.json 등)
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true })
-      .then(cached => cached || fetch(e.request))
-  );
+  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(cached => cached || fetch(e.request)));
 });
