@@ -35,9 +35,22 @@ let preloadAudio = null;
 
 function preloadFile(audioFile) {
   if (preloadAudio) preloadAudio.src = '';
-  preloadAudio = new Audio(`sound/${audioFile}`);
-  preloadAudio.preload = 'auto';
-  preloadAudio.load();
+  const audio = new Audio(`sound/${audioFile}`);
+  preloadAudio = audio;
+  audio.preload = 'auto';
+  audio.load();
+  // 오디오 파이프라인 미리 초기화: 처음 play() 호출 시 생기는 시작 지연 방지
+  audio.addEventListener('canplay', () => {
+    if (preloadAudio !== audio) return;
+    audio.volume = 0;
+    audio.play().then(() => {
+      if (preloadAudio === audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+      }
+    }).catch(() => {});
+  }, { once: true });
 }
 
 function playAudioFile(audioFile, onEnded) {
