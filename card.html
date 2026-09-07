@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta name="theme-color" content="#5b8fba" />
@@ -13,10 +13,11 @@
     <link rel="icon" href="assets/icon.png" type="image/png" />
     <link rel="apple-touch-icon" href="assets/icon.png" />
     <link rel="manifest" href="manifest.json" />
-    <title>스펀지 바이블</title>
+    <title>스펀지 바이블 - 카드 보기</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/card.css" />
   </head>
-  <body>
+  <body class="card-page">
     <!-- 헤더 -->
     <header class="header">
       <div class="header-main">
@@ -35,46 +36,61 @@
     <div id="loading">📖 성경 데이터 불러오는 중…</div>
 
     <!-- 앱 본문 -->
-    <div id="app" style="display: none">
-      <!-- 컨트롤 바 -->
+    <div id="app" class="card-app" style="display: none">
+      <!-- 상단 컨트롤 바 (1줄 콤팩트) -->
       <div class="ctrl-wrap">
         <div class="ctrl-bar">
-          <!-- 1행: 단계 버튼 + 카드 보기 -->
+          <!-- 단계 버튼 + 목록 보기 -->
           <div class="stage-row">
             <button class="stage-btn on" data-s="0">전체 보기</button>
             <button class="stage-btn" data-s="1" title="명사 가리기">1단계</button>
             <button class="stage-btn" data-s="2" title="어구 가리기">2단계</button>
             <button class="stage-btn" data-s="3" title="전체 가리기">3단계</button>
-            <a href="card.html" class="stage-btn mode-btn" title="카드 형태로 보기">🗂️ 카드</a>
+            <a href="index.html" class="stage-btn mode-btn" title="목록 형태로 보기">📋 목록</a>
           </div>
-          <!-- 2행: 전체 공개 + 어절 토글 + 슬라이더 + 진행률 -->
-          <div class="ctrl-foot">
-            <button class="reveal-btn" id="reveal-all">🫣 전체 공개</button>
-            <button class="play-all-btn" id="play-all">▶ 전체</button>
-            <button class="play-reset-btn" id="play-reset" style="display: none" title="처음부터">↩ 처음</button>
-            <div class="phrase-row" id="phrase-row" style="display: none">
-              <button class="phrase-btn on" data-ps="1">1</button>
-              <button class="phrase-btn" data-ps="2">2</button>
-            </div>
-            <input type="range" id="verse-slider" min="1" max="100" value="1" />
-            <div class="ctrl-info">
-              <span id="slider-label">1/100</span>
-              <span class="progress" id="progress">완료 0</span>
-            </div>
+          <!-- 2단계 선택 시에만 표시되는 어구 선택 바 -->
+          <div class="phrase-row" id="phrase-row" style="display: none">
+            <span class="phrase-tip">가릴 어구:</span>
+            <button class="phrase-btn on" data-ps="1">1어절씩</button>
+            <button class="phrase-btn" data-ps="2">2어절씩</button>
           </div>
         </div>
       </div>
 
-      <!-- 구절 목록 -->
-      <div class="verse-wrap">
-        <ol class="verse-bg" id="verse-list"></ol>
-      </div>
+      <!-- 카드 메인 영역 -->
+      <main class="card-main">
+        <div class="card-viewport" id="card-viewport">
+          <div class="card-wrapper" id="card-wrapper">
+            <!-- 자바스크립트로 현재 카드 렌더링 -->
+          </div>
+        </div>
+      </main>
+
+      <!-- 하단 컨트롤 바: [이전] — 슬라이더(1/100) — [다음] -->
+      <!-- 하단 내비게이션 바 -->
+      <footer class="card-bottom-bar">
+        <button class="card-nav-btn" id="btn-prev" title="이전 구절">
+          <span class="nav-arrow">◀</span>
+          <span class="nav-txt">
+            <span class="txt-long">이전 구절</span>
+            <span class="txt-short">이전</span>
+          </span>
+        </button>
+        <button class="card-reveal-btn" id="btn-reveal" title="정답 확인 / 다시 가리기">📖 전체 보기</button>
+        <button class="card-nav-btn" id="btn-next" title="다음 구절">
+          <span class="nav-txt">
+            <span class="txt-long">다음 구절</span>
+            <span class="txt-short">다음</span>
+          </span>
+          <span class="nav-arrow">▶</span>
+        </button>
+      </footer>
     </div>
 
     <!-- JS: 의존 순서대로 로드 -->
     <script src="js/masking.js"></script>
     <script src="js/store.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/card.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {

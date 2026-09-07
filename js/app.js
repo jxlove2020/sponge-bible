@@ -9,17 +9,17 @@ const STATUS_LABEL = { none: '−', learning: '학습중', memorized: '완료' }
 const STATUS_CLASS = { none: 's-none', learning: 's-learning', memorized: 's-memorized' };
 
 // ── DOM 참조 ────────────────────────────────────
-const $loading     = document.getElementById('loading');
-const $app         = document.getElementById('app');
-const $verseList   = document.getElementById('verse-list');
-const $progress    = document.getElementById('progress');
-const $revealAll   = document.getElementById('reveal-all');
-const $fdn         = document.getElementById('fdn');
-const $fup         = document.getElementById('fup');
-const $slider      = document.getElementById('verse-slider');
+const $loading = document.getElementById('loading');
+const $app = document.getElementById('app');
+const $verseList = document.getElementById('verse-list');
+const $progress = document.getElementById('progress');
+const $revealAll = document.getElementById('reveal-all');
+const $fdn = document.getElementById('fdn');
+const $fup = document.getElementById('fup');
+const $slider = document.getElementById('verse-slider');
 const $sliderLabel = document.getElementById('slider-label');
-const $phraseRow   = document.getElementById('phrase-row');
-const $playAllBtn  = document.getElementById('play-all');
+const $phraseRow = document.getElementById('phrase-row');
+const $playAllBtn = document.getElementById('play-all');
 const $playResetBtn = document.getElementById('play-reset');
 
 let phraseSize = 1;
@@ -41,17 +41,24 @@ function preloadFile(audioFile) {
   audio.load();
   // 플레이리스트 컨텍스트에서는 미디어 재생 중 autoplay가 허용되므로
   // canplay 시점에 볼륨=0으로 play→pause하여 파이프라인을 미리 초기화
-  audio.addEventListener('canplay', () => {
-    if (preloadAudio !== audio) return;
-    audio.volume = 0;
-    audio.play().then(() => {
-      if (preloadAudio === audio) {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-      }
-    }).catch(() => {});
-  }, { once: true });
+  audio.addEventListener(
+    'canplay',
+    () => {
+      if (preloadAudio !== audio) return;
+      audio.volume = 0;
+      audio
+        .play()
+        .then(() => {
+          if (preloadAudio === audio) {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = 1;
+          }
+        })
+        .catch(() => {});
+    },
+    { once: true },
+  );
 }
 
 function playAudioFile(audioFile, onEnded) {
@@ -59,7 +66,10 @@ function playAudioFile(audioFile, onEnded) {
     audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
-    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+    if (prev) {
+      prev.textContent = '▶';
+      prev.classList.remove('playing');
+    }
   }
 
   audioPlayingFile = audioFile;
@@ -72,10 +82,13 @@ function playAudioFile(audioFile, onEnded) {
     audioPlayer.preload = 'auto';
   }
 
-  audioPlayer.loop = (repeatFile === audioFile && !onEnded);
+  audioPlayer.loop = repeatFile === audioFile && !onEnded;
 
   const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
-  if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
+  if (btn) {
+    btn.textContent = '⏸';
+    btn.classList.add('playing');
+  }
 
   const doPlay = () => {
     if (audioPlayingFile === audioFile) audioPlayer.play().catch(() => {});
@@ -90,7 +103,10 @@ function playAudioFile(audioFile, onEnded) {
     if (audioPlayingFile === audioFile) {
       audioPlayingFile = '';
       const b = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioFile)}"]`);
-      if (b) { b.textContent = '▶'; b.classList.remove('playing'); }
+      if (b) {
+        b.textContent = '▶';
+        b.classList.remove('playing');
+      }
     }
     if (onEnded) onEnded();
   };
@@ -104,17 +120,23 @@ function updatePlayBtnState() {
 
 function stopPlaylist() {
   isPlaylistActive = false;
-  clearTimeout(scrollSeekTimer);  // 버그3: 미정리 타이머 취소
+  clearTimeout(scrollSeekTimer); // 버그3: 미정리 타이머 취소
   if (audioPlayingFile && playlistIdx > 0) {
     playlistIdx--;
   }
   updatePlayBtnState();
-  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
+  if (preloadAudio) {
+    preloadAudio.src = '';
+    preloadAudio = null;
+  }
   if (audioPlayer) {
     audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
-    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+    if (prev) {
+      prev.textContent = '▶';
+      prev.classList.remove('playing');
+    }
     audioPlayer = null;
     audioPlayingFile = '';
   }
@@ -131,7 +153,9 @@ function playNextInPlaylist() {
   const fullIdx = getVerses().findIndex(gv => gv.ref === v.ref);
   if (fullIdx >= 0) scrollToVerse(fullIdx + 1);
 
-  playAudioFile(v.audio, () => { if (isPlaylistActive) playNextInPlaylist(); });
+  playAudioFile(v.audio, () => {
+    if (isPlaylistActive) playNextInPlaylist();
+  });
 
   if (playlistIdx < playlistVerses.length) {
     preloadFile(playlistVerses[playlistIdx].audio);
@@ -165,7 +189,7 @@ $playAllBtn.addEventListener('click', () => {
   }
   isPlaylistActive = true;
   $playAllBtn.textContent = '⏹ 정지';
-  $playResetBtn.style.display = 'none';  // 버그1: 재생 중 ↩처음 버튼 숨김
+  $playResetBtn.style.display = 'none'; // 버그1: 재생 중 ↩처음 버튼 숨김
 
   if (playlistIdx < playlistVerses.length) {
     preloadFile(playlistVerses[playlistIdx].audio);
@@ -199,25 +223,26 @@ function handleAudio(btn) {
 let isRendering = false;
 function renderList() {
   isRendering = true;
-  requestAnimationFrame(() => { isRendering = false; });
+  requestAnimationFrame(() => {
+    isRendering = false;
+  });
   const verses = getVerses();
-  const stg    = getStage();
-  const done   = verses.filter(v => getStat(v.ref) === 'memorized').length;
+  const stg = getStage();
+  const done = verses.filter(v => getStat(v.ref) === 'memorized').length;
 
   $progress.textContent = `완료 ${done}`;
 
-  $verseList.innerHTML = verses.map(v => {
-    const st  = getStat(v.ref);
-    const rev = isRevealed(v.ref);
-    const txt = renderMasked(v.text, stg, rev, v.ref, phraseSize);
-    const clk = stg > 0 ? ' click' : '';
-    const audioBtn = v.audio
-      ? `<button class="audio-btn" data-audio="${esc(v.audio)}" title="듣기">▶</button>`
-      : '';
-    const repeatBtn = v.audio
-      ? `<button class="repeat-btn${repeatFile === v.audio ? ' active' : ''}" data-repeat="${esc(v.audio)}" title="반복">↺</button>`
-      : '';
-    return `<li class="verse-row">
+  $verseList.innerHTML = verses
+    .map(v => {
+      const st = getStat(v.ref);
+      const rev = isRevealed(v.ref);
+      const txt = renderMasked(v.text, stg, rev, v.ref, phraseSize);
+      const clk = stg > 0 ? ' click' : '';
+      const audioBtn = v.audio ? `<button class="audio-btn" data-audio="${esc(v.audio)}" title="듣기">▶</button>` : '';
+      const repeatBtn = v.audio
+        ? `<button class="repeat-btn${repeatFile === v.audio ? ' active' : ''}" data-repeat="${esc(v.audio)}" title="반복">↺</button>`
+        : '';
+      return `<li class="verse-row">
       <div class="verse-header">
         <span class="verse-ref">${esc(v.ref)}</span>
         <div class="verse-actions">
@@ -227,19 +252,22 @@ function renderList() {
       </div>
       <span class="verse-text${clk}" data-r="${esc(v.ref)}">${txt}</span>
     </li>`;
-  }).join('');
+    })
+    .join('');
 
   if (audioPlayingFile && audioPlayer && !audioPlayer.paused) {
     const btn = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
-    if (btn) { btn.textContent = '⏸'; btn.classList.add('playing'); }
+    if (btn) {
+      btn.textContent = '⏸';
+      btn.classList.add('playing');
+    }
   }
 }
 
 // ── 단계 변경 ───────────────────────────────────
 function changeStage(s) {
   setStage(s);
-  document.querySelectorAll('.stage-btn')
-    .forEach(b => b.classList.toggle('on', +b.dataset.s === s));
+  document.querySelectorAll('.stage-btn[data-s]').forEach(b => b.classList.toggle('on', +b.dataset.s === s));
   $revealAll.style.display = s > 0 ? 'inline' : 'none';
   $revealAll.textContent = '🫣 전체 공개';
   $phraseRow.style.display = s === 2 ? 'flex' : 'none';
@@ -250,8 +278,7 @@ function changeStage(s) {
 document.querySelectorAll('.phrase-btn').forEach(b => {
   b.addEventListener('click', () => {
     phraseSize = +b.dataset.ps;
-    document.querySelectorAll('.phrase-btn')
-      .forEach(x => x.classList.toggle('on', +x.dataset.ps === phraseSize));
+    document.querySelectorAll('.phrase-btn').forEach(x => x.classList.toggle('on', +x.dataset.ps === phraseSize));
     clearAllStage2Flips();
     renderList();
   });
@@ -262,7 +289,7 @@ document.querySelectorAll('.phrase-btn').forEach(b => {
 // vh 대신 window.innerHeight 사용: iOS Safari에서 100vh ≠ 실제 가시 영역
 function setVerseWrapPadding() {
   const headerH = document.querySelector('.header').offsetHeight;
-  const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+  const ctrlH = document.querySelector('.ctrl-wrap').offsetHeight;
   const pad = window.innerHeight - headerH - ctrlH - 20;
   document.querySelector('.verse-wrap').style.paddingBottom = Math.max(pad, 60) + 'px';
 }
@@ -273,7 +300,7 @@ function scrollToVerse(n) {
   const target = items[n - 1];
   if (!target) return;
   const headerH = document.querySelector('.header').offsetHeight;
-  const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+  const ctrlH = document.querySelector('.ctrl-wrap').offsetHeight;
   const top = target.getBoundingClientRect().top + window.scrollY - headerH - ctrlH - 8;
   const behavior = navigator.maxTouchPoints > 0 ? 'instant' : 'smooth';
   window.scrollTo({ top, behavior });
@@ -285,7 +312,7 @@ $slider.addEventListener('input', () => {
 });
 
 function seekPlaylistTo(n) {
-  if (!isPlaylistActive) return;  // 버그2: 비활성 상태에서 타이머 실행 방지
+  if (!isPlaylistActive) return; // 버그2: 비활성 상태에서 타이머 실행 방지
   const startVerse = getVerses()[n - 1];
   if (!startVerse) return;
   const idx = playlistVerses.findIndex(v => v.ref === startVerse.ref);
@@ -294,11 +321,17 @@ function seekPlaylistTo(n) {
     audioPlayer.onended = null;
     audioPlayer.pause();
     const prev = $verseList.querySelector(`.audio-btn[data-audio="${CSS.escape(audioPlayingFile)}"]`);
-    if (prev) { prev.textContent = '▶'; prev.classList.remove('playing'); }
+    if (prev) {
+      prev.textContent = '▶';
+      prev.classList.remove('playing');
+    }
     audioPlayer = null;
     audioPlayingFile = '';
   }
-  if (preloadAudio) { preloadAudio.src = ''; preloadAudio = null; }
+  if (preloadAudio) {
+    preloadAudio.src = '';
+    preloadAudio = null;
+  }
   playlistIdx = idx;
   playNextInPlaylist();
 }
@@ -320,7 +353,7 @@ window.addEventListener('scroll', () => {
   requestAnimationFrame(() => {
     const items = $verseList.querySelectorAll('li');
     const headerH = document.querySelector('.header').offsetHeight;
-    const ctrlH   = document.querySelector('.ctrl-wrap').offsetHeight;
+    const ctrlH = document.querySelector('.ctrl-wrap').offsetHeight;
     const threshold = headerH + ctrlH + 20;
     let current = 1;
     for (let i = 0; i < items.length; i++) {
@@ -346,11 +379,18 @@ function refreshFontBtns() {
   $fup.disabled = i === getSizes().length - 1;
 }
 
-$fdn.addEventListener('click', () => { setSize(getSizeIdx() - 1); refreshFontBtns(); });
-$fup.addEventListener('click', () => { setSize(getSizeIdx() + 1); refreshFontBtns(); });
+$fdn.addEventListener('click', () => {
+  setSize(getSizeIdx() - 1);
+  refreshFontBtns();
+});
+$fup.addEventListener('click', () => {
+  setSize(getSizeIdx() + 1);
+  refreshFontBtns();
+});
 
 // ── 단계 버튼 ────────────────────────────────────
-document.querySelectorAll('.stage-btn')
+document
+  .querySelectorAll('.stage-btn[data-s]')
   .forEach(b => b.addEventListener('click', () => changeStage(+b.dataset.s)));
 
 $revealAll.addEventListener('click', () => {
@@ -416,6 +456,11 @@ async function init() {
     refreshFontBtns();
 
     loadStat();
+    loadStage();
+    const initSt = getStage();
+    document.querySelectorAll('.stage-btn[data-s]').forEach(b => b.classList.toggle('on', +b.dataset.s === initSt));
+    $revealAll.style.display = initSt > 0 ? 'inline' : 'none';
+    $phraseRow.style.display = initSt === 2 ? 'flex' : 'none';
 
     $loading.style.display = 'none';
     $app.style.display = '';

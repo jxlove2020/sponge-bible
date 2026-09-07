@@ -1,16 +1,19 @@
 /* ── 리셋 & 기본 ── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
-html { font-size: 16px; }
+html {
+  font-size: 16px;
+}
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-               "Malgun Gothic", "맑은 고딕", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
   background: #f9fafb;
   color: #111827;
   min-height: 100vh;
@@ -76,11 +79,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all .12s;
+  transition: all 0.12s;
 }
 
-.font-btn:hover:not(:disabled) { background: #e5e7eb; border-color: #9ca3af; }
-.font-btn:disabled { opacity: .3; cursor: default; }
+.font-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+.font-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
 
 /* ── 컨트롤 바 ── */
 .ctrl-wrap {
@@ -98,10 +107,10 @@ body {
   padding: 10px 16px 10px;
 }
 
-/* 1행: 단계 버튼 4개 균등 배치 */
+/* 1행: 단계 버튼 4개 균등 배치 + 카드 전환 버튼 */
 .stage-row {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 
 .stage-btn {
@@ -111,12 +120,17 @@ body {
   border: 1.5px solid #e5e7eb;
   background: #f3f4f6;
   color: #4b5563;
-  font-size: 0.9em;
+  font-size: clamp(11.5px, 3.1vw, 14px);
   font-weight: 700;
   cursor: pointer;
-  transition: all .12s;
+  transition: all 0.12s;
   text-align: center;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .stage-btn.on {
@@ -125,7 +139,22 @@ body {
   border-color: #4a7a9b;
 }
 
-.stage-btn:hover:not(.on) { background: #e5e7eb; }
+.stage-btn:hover:not(.on) {
+  background: #e5e7eb;
+}
+
+.stage-btn.mode-btn {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.stage-btn.mode-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
 
 /* 어절 토글: ctrl-foot 안 세그먼트 컨트롤 */
 .phrase-row {
@@ -141,13 +170,18 @@ body {
   font-size: 0.78em;
   font-weight: 700;
   cursor: pointer;
-  transition: all .12s;
+  transition: all 0.12s;
   white-space: nowrap;
   line-height: 1;
 }
 
-.phrase-btn:first-child { border-radius: 6px 0 0 6px; }
-.phrase-btn:last-child  { border-radius: 0 6px 6px 0; border-left: none; }
+.phrase-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+.phrase-btn:last-child {
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
 
 .phrase-btn.on {
   background: #5b8fba;
@@ -155,8 +189,12 @@ body {
   border-color: #4a7a9b;
 }
 
-.phrase-btn.on + .phrase-btn { border-left-color: #4a7a9b; }
-.phrase-btn:hover:not(.on) { background: #dbedf7; }
+.phrase-btn.on + .phrase-btn {
+  border-left-color: #4a7a9b;
+}
+.phrase-btn:hover:not(.on) {
+  background: #dbedf7;
+}
 
 /* 2행: 전체 공개 + 슬라이더 + 진행률 */
 .ctrl-foot {
@@ -205,15 +243,21 @@ body {
 }
 
 @media (hover: hover) {
-  .play-reset-btn:hover { opacity: 0.7; }
+  .play-reset-btn:hover {
+    opacity: 0.7;
+  }
 }
 
 @media (hover: hover) {
-  .play-all-btn:hover { opacity: 0.7; }
+  .play-all-btn:hover {
+    opacity: 0.7;
+  }
 }
 
 @media (hover: hover) {
-  .reveal-btn:hover { opacity: 0.7; }
+  .reveal-btn:hover {
+    opacity: 0.7;
+  }
 }
 
 #verse-slider {
@@ -244,7 +288,9 @@ body {
 }
 
 /* ── 구절 목록 ── */
-.verse-wrap { padding: 16px 12px 60px; }
+.verse-wrap {
+  padding: 16px 12px 60px;
+}
 
 .verse-bg {
   list-style: none;
@@ -289,7 +335,7 @@ body {
   color: #5b8fba;
   font-size: 10px;
   cursor: pointer;
-  transition: all .15s;
+  transition: all 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,7 +349,9 @@ body {
 }
 
 @media (hover: hover) {
-  .audio-btn:hover { opacity: 0.85; }
+  .audio-btn:hover {
+    opacity: 0.85;
+  }
 }
 
 .repeat-btn {
@@ -315,7 +363,7 @@ body {
   color: #9ca3af;
   font-size: 14px;
   cursor: pointer;
-  transition: all .15s;
+  transition: all 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -329,8 +377,13 @@ body {
 }
 
 @media (hover: hover) {
-  .repeat-btn:hover:not(.active) { background: #d1d5db; color: #6b7280; }
-  .repeat-btn.active:hover { opacity: 0.85; }
+  .repeat-btn:hover:not(.active) {
+    background: #d1d5db;
+    color: #6b7280;
+  }
+  .repeat-btn.active:hover {
+    opacity: 0.85;
+  }
 }
 
 .verse-ref {
@@ -385,13 +438,22 @@ body {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: all .12s;
+  transition: all 0.12s;
   text-align: center;
 }
 
-.s-none      { background: #f3f4f6; color: #9ca3af; }
-.s-learning  { background: #fef9c3; color: #a16207; }
-.s-memorized { background: #dcfce7; color: #15803d; }
+.s-none {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+.s-learning {
+  background: #fef9c3;
+  color: #a16207;
+}
+.s-memorized {
+  background: #dcfce7;
+  color: #15803d;
+}
 
 /* ── 로딩 / 에러 ── */
 #loading {

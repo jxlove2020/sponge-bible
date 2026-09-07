@@ -1,0 +1,774 @@
+html,
+body.card-page {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f1f5f9;
+  overscroll-behavior-x: none;
+  overscroll-behavior: none;
+}
+
+.card-app,
+.card-main,
+.card-viewport,
+.card-wrapper {
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  overscroll-behavior: none;
+}
+
+/* 데스크탑 헤더 중앙 정렬 */
+.card-page .header {
+  position: relative;
+  top: auto;
+  z-index: 20;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.card-page .header-main {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 카드 앱 컨테이너 */
+.card-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+/* 상단 컨트롤 바 (1줄 콤팩트) */
+.card-page .ctrl-wrap {
+  position: relative;
+  top: auto;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.card-page .ctrl-bar {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 6px 14px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.card-page .phrase-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.card-page .phrase-tip {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* ── 메인 카드 뷰포트 영역 ── */
+.card-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #f8fafc;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-viewport {
+  width: 100%;
+  max-width: 520px;
+  height: 100%;
+  max-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.card-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 성경 카드 ── */
+.bible-card {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow:
+    0 8px 24px -4px rgba(15, 23, 42, 0.08),
+    0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 14px;
+  box-sizing: border-box;
+  touch-action: pan-y;
+  cursor: grab;
+  position: relative;
+  overflow: hidden;
+  will-change: transform, opacity;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.25s ease-out;
+}
+
+.bible-card:active {
+  cursor: grabbing;
+}
+
+.bible-card.swiping {
+  transition: none !important;
+}
+
+/* 카드 헤더 (장절 정보, 오디오, 상태) */
+.card-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.card-ref-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-idx-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 8px;
+  letter-spacing: -0.3px;
+}
+
+.card-ref-text {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 오디오 & 반복 듣기 버튼 */
+.card-audio-btn,
+.card-repeat-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid #d1d5db;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.12s,
+    border-color 0.12s,
+    box-shadow 0.12s;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.card-audio-btn:hover,
+.card-repeat-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.card-audio-btn.playing {
+  background: #5b8fba;
+  border-color: #4a7a9b;
+  color: #fff;
+  animation: pulse-border 1.2s infinite;
+}
+
+.card-repeat-btn.active {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(91, 143, 186, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(91, 143, 186, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(91, 143, 186, 0);
+  }
+}
+
+/* 상태 버튼 */
+.card-stat-btn {
+  min-width: 52px;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition:
+    transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.12s,
+    color 0.12s;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ── 버튼 터치 감도 및 피드백 개선 ── */
+.stage-btn,
+.phrase-btn {
+  touch-action: manipulation;
+}
+
+.stage-btn:active,
+.phrase-btn:active {
+  transform: scale(0.96) !important;
+  filter: brightness(0.92);
+}
+
+.card-audio-btn:active,
+.card-repeat-btn:active,
+.card-stat-btn:active,
+.card-nav-btn:active,
+.card-reveal-btn:active,
+.font-btn:active {
+  transform: scale(0.93);
+  filter: brightness(0.93);
+}
+
+/* 카드 본문 (스크롤 컨테이너) */
+.card-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  color: #1e293b;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── 항상 보기 좋은 완벽한 가운데 정렬 컨테이너 ── */
+.verse-center-box {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card-body .verse-text {
+  width: 100%;
+  text-align: center;
+  line-height: 1.8;
+  word-break: keep-all;
+  padding: 6px 0;
+}
+
+/* 카드 본문 슬림 스크롤바 */
+.card-body::-webkit-scrollbar {
+  width: 4px;
+}
+.card-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.card-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+/* 카드 하단 슬라이더 박스 (사용자 업로드 이미지 스타일) */
+.card-slider-box {
+  flex-shrink: 0;
+  width: 100%;
+  padding: 10px 4px 4px;
+  border-top: 1.5px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 인라인 슬라이더 트랙 */
+.card-inline-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  outline: none;
+  margin: 6px 0 8px;
+  cursor: pointer;
+  background: #e2e8f0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* 크롬/사파리 손잡이 */
+.card-inline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.card-inline-slider::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+}
+
+/* 파이어폭스 손잡이 */
+.card-inline-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+/* 슬라이더 하단 라벨 (이미지 레이아웃: 62 / 100 및 완료 0) */
+.card-slider-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.card-slider-cur {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e3a8a;
+  letter-spacing: -0.3px;
+}
+
+.card-slider-stat {
+  font-size: 12px;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+/* ── 하단 컨트롤 바 ── */
+.card-bottom-bar {
+  flex-shrink: 0;
+  height: 60px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card-nav-btn {
+  flex: 1;
+  max-width: 240px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.card-nav-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.card-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.card-nav-btn .txt-short {
+  display: none;
+}
+
+.card-nav-btn .txt-long {
+  display: inline;
+}
+
+.card-action-btn:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: default;
+}
+
+/* 정답 확인 / 다시 가리기 버튼 */
+.card-reveal-btn {
+  flex: 1;
+  max-width: 140px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.12s ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+}
+
+.card-reveal-btn:hover:not(:disabled) {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.card-reveal-btn.revealed {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.card-reveal-btn:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: default;
+  opacity: 0.65;
+}
+
+/* 개별 마스킹 단어 터치 시 엿보기 효과 */
+.card-page .masked {
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.card-page .masked.word-revealed {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+/* 모바일 좁은 화면 대응 */
+@media (max-width: 640px) {
+  .card-app {
+    box-shadow: none;
+  }
+}
+
+@media (max-height: 640px) and (orientation: portrait) {
+  .card-main {
+    padding: 8px 12px;
+  }
+  .bible-card {
+    padding: 12px 14px 8px;
+    border-radius: 16px;
+  }
+  .card-header-bar {
+    padding-bottom: 6px;
+  }
+  .card-bottom-bar {
+    height: 52px;
+    padding: 0 10px;
+  }
+  .card-nav-btn {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  .card-action-btn {
+    padding: 7px 8px;
+    font-size: 13px;
+  }
+}
+
+/* ── 모바일 가로 모드 (Landscape) 어르신 최적화 UI ── */
+@media (orientation: landscape) and (max-height: 540px) {
+  .card-page .header {
+    height: 38px;
+  }
+
+  .card-page .header-main {
+    max-width: 100%;
+    height: 38px;
+    padding: 0 12px;
+  }
+
+  .card-page .header-left {
+    font-size: 12px;
+    width: auto;
+  }
+
+  .card-page .header-center img {
+    height: 20px;
+    width: auto;
+  }
+
+  .card-page .font-btn {
+    width: 32px;
+    height: 28px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .card-app {
+    max-width: 100%;
+    height: calc(100vh - 38px);
+    height: calc(100dvh - 38px);
+    background: #f8fafc;
+  }
+
+  .card-page .ctrl-bar {
+    max-width: 100%;
+    padding: 4px 12px 6px;
+    gap: 4px;
+  }
+
+  .stage-row {
+    gap: 4px;
+  }
+
+  .stage-btn {
+    padding: 4px 0;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  /* 메인 뷰포트: 좌우 60px 패딩을 두어 대형 버튼과 겹침 방지 */
+  .card-main {
+    padding: 4px 8px 6px;
+    position: relative;
+  }
+
+  .card-viewport {
+    max-width: 860px;
+    max-height: 100%;
+    padding: 0 72px;
+    box-sizing: border-box;
+  }
+
+  .bible-card {
+    padding: 10px 18px 8px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  }
+
+  .card-header-bar {
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+  }
+
+  .card-idx-badge {
+    font-size: 12px;
+    padding: 2px 7px;
+  }
+
+  .card-ref-text {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .card-audio-btn,
+  .card-repeat-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .card-stat-btn {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  /* 본문 말씀: 과도한 1.2em 확장을 제거하고 좌우 여백을 주어 답답함 해소 */
+  .card-body {
+    padding: 6px 16px;
+    line-height: 1.65;
+  }
+
+  .card-body .verse-text {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.65;
+    max-width: 94%;
+  }
+
+  .card-slider-box {
+    padding: 4px 2px 2px;
+  }
+
+  .card-inline-slider {
+    height: 6px;
+    margin: 4px 0 4px;
+  }
+
+  .card-inline-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card-slider-cur {
+    font-size: 12px;
+  }
+
+  .card-slider-stat {
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+
+  /* 하단 바 숨김 & 좌우 큼직한 이전/다음 버튼으로 배치 */
+  .card-bottom-bar {
+    position: static;
+    height: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .card-bottom-center,
+  .card-action-btn,
+  .card-reveal-btn {
+    display: none;
+  }
+
+  /* 가로 모드 버튼 텍스트: 간결하게 '이전', '다음'으로 전환 */
+  .card-nav-btn .txt-long {
+    display: none;
+  }
+
+  .card-nav-btn .txt-short {
+    display: inline;
+  }
+
+  /* 어르신 엄지손가락용 여유롭고 깔끔한 좌우 터치 패드 */
+  .card-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 80px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    box-sizing: border-box;
+    z-index: 25;
+    cursor: pointer;
+  }
+
+  /* 양쪽 버튼 모두 화살표가 위, 글자가 아래로 오도록 일관되게 정렬 */
+  .card-nav-btn .nav-arrow {
+    order: 1;
+    font-size: 16px;
+    line-height: 1;
+    color: #475569;
+    margin-bottom: 2px;
+  }
+
+  .card-nav-btn .nav-txt {
+    order: 2;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+    color: #1e293b;
+  }
+
+  .card-nav-btn#btn-prev {
+    left: 8px;
+  }
+
+  .card-nav-btn#btn-next {
+    right: 8px;
+  }
+
+  .card-nav-btn:active:not(:disabled) {
+    background: #e2e8f0;
+    transform: translateY(-50%) scale(0.93) !important;
+  }
+}
