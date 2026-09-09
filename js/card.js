@@ -494,7 +494,7 @@ function bindEvents() {
       if (targetIdx !== currentIdx) {
         triggerHaptic(10);
         stopAudio();
-        const dir = targetIdx > currentIdx ? 1 : -1;
+        const dir = targetIdx > currentIdx ? -1 : 1;
         currentIdx = targetIdx;
         renderCard(dir);
       }
@@ -564,6 +564,9 @@ function bindEvents() {
         }
       }
     } else if (e.key === ' ' || e.key === 'Enter') {
+      // 버튼·링크·슬라이더에 포커스가 있으면 그 요소의 기본 동작에 맡긴다.
+      // (여기서 처리하면 keydown 토글 + 버튼 click 이 이중 실행됨)
+      if (e.target.closest('button, a, input, textarea, select')) return;
       const v = getVerses()[currentIdx];
       if (v && getStage() > 0) {
         e.preventDefault();
