@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v74';
+const CACHE = 'sponge-bible-v75';
 
 const SHELL = [
   './',
@@ -18,7 +18,8 @@ const OPTIONAL = ['./assets/icon.png', './assets/logo.png'];
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(async c => {
-      await c.addAll(SHELL);
+      // 새 버전 설치 시 브라우저 HTTP 캐시의 이전 CSS/JS를 다시 저장하지 않는다.
+      await c.addAll(SHELL.map(url => new Request(url, { cache: 'reload' })));
       await Promise.allSettled(OPTIONAL.map(url => c.add(url)));
     }),
   );
