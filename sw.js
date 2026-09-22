@@ -1,4 +1,4 @@
-const CACHE = 'sponge-bible-v75';
+const CACHE = 'sponge-bible-v77';
 
 const SHELL = [
   './',
