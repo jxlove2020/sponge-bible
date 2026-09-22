@@ -29,6 +29,30 @@ let isAudioPlaying = false;
 let isRepeatActive = false;
 let isTransitioning = false;
 
+// PWA의 최초 진입·복귀 때 실제로 보이는 높이에 하단 버튼을 맞춘다.
+function syncCardViewport() {
+  const height = window.visualViewport?.height || window.innerHeight;
+  if (height > 0) {
+    document.documentElement.style.setProperty('--card-viewport-height', `${height}px`);
+  }
+}
+
+let viewportFrame = 0;
+function scheduleCardViewportSync() {
+  if (viewportFrame) return;
+  viewportFrame = requestAnimationFrame(() => {
+    viewportFrame = 0;
+    syncCardViewport();
+  });
+}
+
+window.addEventListener('resize', scheduleCardViewportSync);
+window.addEventListener('pageshow', scheduleCardViewportSync);
+window.visualViewport?.addEventListener('resize', scheduleCardViewportSync);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') scheduleCardViewportSync();
+});
+
 // ── 모바일 햅틱 진동 피드백 (버튼 클릭감) ─────────
 function triggerHaptic(duration = 15) {
   try {
@@ -40,6 +64,7 @@ function triggerHaptic(duration = 15) {
 
 // ── 데이터 로드 & 초기화 ────────────────────────
 async function init() {
+  syncCardViewport();
   loadStat();
   loadStage();
   applySavedSize();
@@ -64,6 +89,7 @@ async function init() {
 
   $loading.style.display = 'none';
   $app.style.display = 'flex';
+  scheduleCardViewportSync();
 
   const st = getStage();
   document.querySelectorAll('.stage-btn[data-s]').forEach(x => x.classList.toggle('on', +x.dataset.s === st));
