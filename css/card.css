@@ -777,16 +777,10 @@ body.card-page {
     padding: 2px 6px;
   }
 
-  /* 하단 바 숨김 & 좌우 큼직한 이전/다음 버튼으로 배치 */
   /* 하단 바: 가로 모드에서도 항상 단정하게 중앙 하단 배치 */
   .card-bottom-bar {
-    position: static;
-    height: 0;
-    padding: 0;
-    border: none;
-    background: transparent;
     position: relative;
-    height: 42px;
+    height: auto;
     min-height: 42px;
     padding: 3px 14px;
     padding-bottom: max(3px, env(safe-area-inset-bottom, 0px));
@@ -800,11 +794,8 @@ body.card-page {
     overflow: visible;
   }
 
-  .card-bottom-center,
-  .card-action-btn,
   .card-nav-btn {
     position: static;
-    transform: none !important;
     flex: 1;
     max-width: 180px;
     height: 34px;
@@ -820,8 +811,7 @@ body.card-page {
   }
 
   .card-reveal-btn {
-    display: none;
-    display: flex !important;
+    display: flex;
     position: static;
     flex: 1;
     max-width: 160px;
@@ -831,76 +821,32 @@ body.card-page {
     padding: 0 8px;
   }
 
-  /* 가로 모드 버튼 텍스트: 간결하게 '이전', '다음'으로 전환 */
+  /* 가로 모드에서도 '이전 구절', '다음 구절' 표시 */
   .card-nav-btn .txt-long {
-    display: none;
     display: inline;
   }
 
   .card-nav-btn .txt-short {
-    display: inline;
     display: none;
   }
 
-  /* 어르신 엄지손가락용 여유롭고 깔끔한 좌우 터치 패드 */
-  .card-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 52px;
-    height: 80px;
-    border-radius: 14px;
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
-    color: #1e293b;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 6px 2px;
-    box-sizing: border-box;
-    z-index: 25;
-    cursor: pointer;
-  }
-
-  /* 양쪽 버튼 모두 화살표가 위, 글자가 아래로 오도록 일관되게 정렬 */
   .card-nav-btn .nav-arrow {
-    order: 1;
-    font-size: 16px;
     line-height: 1;
     color: #475569;
-    margin-bottom: 2px;
-    order: initial;
     font-size: 12px;
-    margin-bottom: 0;
   }
 
   .card-nav-btn .nav-txt {
-    order: 2;
-    order: initial;
     font-size: 13px;
     font-weight: 800;
     line-height: 1.2;
     text-align: center;
     white-space: nowrap;
-    letter-spacing: -0.5px;
     color: #1e293b;
-    letter-spacing: normal;
-  }
-
-  .card-nav-btn#btn-prev {
-    left: 8px;
-  }
-
-  .card-nav-btn#btn-next {
-    right: 8px;
   }
 
   .card-nav-btn:active:not(:disabled) {
     background: #e2e8f0;
-    transform: translateY(-50%) scale(0.93) !important;
-    transform: scale(0.95) !important;
+    transform: scale(0.95);
   }
 }
